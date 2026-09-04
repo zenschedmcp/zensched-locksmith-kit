@@ -50,7 +50,7 @@ Derive from local IDs so a retry or a re-run of the same request cannot create d
 | `worker_invite` | `worker-{email}` |
 | `form_create` | `form-job-record` |
 
-A tech swap on the same call appends `-2` to the shift key. `form_assign` takes `form_id` and `event_id` only.
+Each tech swap on the same call appends the next unused suffix to the shift key (`shift-call-{call_id}-2`, then `-3`, …); never reuse a suffix, because ZenSched replays a key for 24 hours and would hand back the cancelled shift. `form_assign` takes `form_id` and `event_id` only.
 
 ## The Job Record form
 
@@ -211,7 +211,7 @@ Payouts are per call, not hourly. If the owner also wants an hours record, `time
 
 - **Fee change for a client:** `UPDATE clients SET default_service_fee = ? WHERE client_id = ?`. Existing calls keep their snapshot fees.
 - **Pin is wrong at a repeat site:** `location_update(location_id, lat, lng)` (free) or `location_refine` ($0.10). Because the place is cached, the fix sticks.
-- **Tech swap** (agency): `shift_cancel` the old shift, `UPDATE calls SET tech_id = ?, zensched_shift_id = NULL`, then `shift_create` on the same event for the new worker with key `shift-call-{call_id}-2`, and update `zensched_shift_id`.
+- **Tech swap** (agency): `shift_cancel` the old shift, `UPDATE calls SET tech_id = ?, zensched_shift_id = NULL`, then `shift_create` on the same event for the new worker with key `shift-call-{call_id}-2` (`-3` for a second swap, and so on; never reuse a suffix), and update `zensched_shift_id`. If the Job Record was attached after a shift already existed, `form_assign(form_id, event_id=...)` installs it on that shift; do not cancel and recreate.
 - **Client inactive:** `UPDATE clients SET is_active = 0`.
 
 ## Errors
