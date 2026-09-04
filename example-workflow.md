@@ -237,7 +237,8 @@ form_submissions:
       { submission_id: 3402, worker_id: 601, event_id: 7102, submitted_at: "2026-09-08 15:13:00",
         data: { job_type: "lockout", id_checked: "yes___driver_license",
                 lock_type: "Schlage residential deadbolt", amount: 185 },
-        media: [ { field: "work", cdn_url: "https://cdn.zensched.com/m/.../cyl.jpg" } ] }
+        media: [ { field_id: 5, cdn_url: "https://cdn.zensched.com/m/.../cyl.jpg",
+                   thumbnail_url: "https://cdn.zensched.com/m/.../cyl_thumb.jpg", original_filename: "cyl.jpg" } ] }
     ], count: 1, billing: { meter: "form_media", units: 1, price: 0.15 }
 
 sqlite_execute:

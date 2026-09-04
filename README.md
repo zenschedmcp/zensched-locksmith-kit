@@ -206,7 +206,7 @@ In solo mode you invite yourself; the email arrives at your own address, you ins
 | Check-in not GPS-verified at a hotel / complex | You parked outside the policy radius, or the pin is on the road | "Set the check-in radius to 250 m" (`policy_update(0, {"checkin_radius_m": 250})`; never "on that location"), or "move the pin to the lobby" (`location_update`, free; the cached place keeps it) |
 | "I'm here now" took too long and the punch was refused | Window opened more than `checkin_slack_min` after the tech arrived | Have the AI `shift_update` the window to the real arrival time; raise the slack |
 | Forgot to check out | Shift still `checked_in` | Tell the AI the real time; the 15-minute check-out reminder is already on |
-| Job Record not on the phone | Form not assigned to that call's event before the shift was created | "Attach the Job Record to C-2026-0004" (`form_assign`), then cancel and recreate the shift |
+| Job Record not on the phone | Form not assigned to that call's event before the shift was created | "Attach the Job Record to C-2026-0004" (`form_assign(form_id, event_id=…)`); it installs on the existing shift, no cancel/recreate. Recreating with the same `shift-call-{call_id}` key would only replay the cancelled shift for 24 hours |
 | AI refuses to store an ID number | Working as intended | That goes on your paper ticket if your board wants it |
 | Same hotel geocoded twice | Address typed differently (suite on a new line, "Ave" vs "Avenue") | Tell the AI it is the same place; it merges the `places` rows and keeps one location |
 | Call moved to another day fails on `shift_update` | Events are single-day | The AI cancels the shift and creates a new call (`rescheduled_from`) with its own event; ask it to |
@@ -241,7 +241,7 @@ If something is confusing or broken in ZenSched itself, ask the AI to call `feed
 
 - location: `loc-place-{place_id}`
 - event: `event-call-{call_id}`
-- shift: `shift-call-{call_id}` (a tech swap on the same call appends `-2`)
+- shift: `shift-call-{call_id}` (each tech swap on the same call appends the next suffix: `-2`, then `-3`, … — never reuse a suffix, or the 24-hour replay returns the cancelled shift)
 - cancel: `cancel-shift-{shift_id}`
 - worker: `worker-{email}`
 - form: `form-job-record`
